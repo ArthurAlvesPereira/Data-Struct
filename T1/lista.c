@@ -17,19 +17,16 @@ typedef struct list {
 
 Lista createLista(int capacidade){
     List *l = calloc(1, sizeof(List));
-    l->size = 0;
-    l->head = NULL;
-    l->tail = NULL;
     if (capacidade < 0)
     {
-      l->max = CAPAC_ILIMITADA;
+      l->max = __INT_MAX__;
     } else {
       l->max = capacidade;
     }
     return l;
 }
 
-int lengthLista(Lista l){
+int length(Lista l){
     List *list = (List*) l;
     return list->size;
 }
@@ -172,6 +169,7 @@ void killLista(Lista l){
     while (n != NULL)
     {
       Node *aux = n;
+      free(aux->info);
       n = n->next;
       free(aux);
     }
