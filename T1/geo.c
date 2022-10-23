@@ -46,16 +46,5 @@ void geo_read(void* fp, Lista l){
   }
 }
 
-void geo_init(char *filename, Lista l){
-  FILE *fp = fopen(filename, "r");
-  if (fp == NULL)
-  {
-    printf("Erro ao abrir o arquivo %s", filename);
-    //exit(EXIT_FAILURE);
-  }
 
-  geo_read(fp, l);
-  //return fp;
-  fclose(fp);
-} // geo_init
 

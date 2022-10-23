@@ -4,6 +4,6 @@
 typedef void* Svg;
 
 void PrintList(void* l);
-void PrintSVG(void* l);
+void PrintSVG(void* l, void* p);
 
 #endif

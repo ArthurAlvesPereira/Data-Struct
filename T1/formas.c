@@ -64,27 +64,25 @@ Form CreateText(int id, double x, double y, char corb[100], char corp[100], char
     f->id = id;
     f->x = x;
     f->y = y;
-    if (anchor[0] == 's'){
+    if (anchor[0] == 'i'){
         strcpy(f->anchor, "start");
     } else if (anchor[0] == 'm'){
         strcpy(f->anchor, "middle");
-    } else if (anchor[0] == 'e'){
+    } else if (anchor[0] == 'f'){
         strcpy(f->anchor, "end");
     }
-    printf("aqui: %s\n", f->text);
-    
     strcpy(f->corb, corb);
     strcpy(f->corp, corp);
     strcpy(f->text, text);
     return f;
 }
 
+
 // Gets
 
 char GetType(void* l){
     Forma *f = (Forma*) l;
     return f->type;
-    //printf("%c", f->&type);
 }
 
 int GetId(void* l){
@@ -130,7 +128,6 @@ double GetY2(void* l){
 char* GetText(void* l){
     Forma *f = (Forma*) l;
     return f->text;
-    printf("aqui2: %s\n", f->text);
 }
 
 char* GetAnchor(void* l){
