@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "lista.h"
 #include "path.h"
 #include "system.h"
 #include "formas.h"
-#include "qry.h"
-#include "svg.h"
+// #include "qry.h"
+// #include "svg.h"
 
 typedef struct Path
 {
@@ -117,8 +118,10 @@ path readParamter(int argc, char **argv)
 void geo_read(path pPath, Lista l)
 {
 	int id;
-	double x, x2, y, y2, w, h, r;
+	double x, x2, y, y2, w, h, r, fSize;
 	char corb[100], corp[100], cor[100], a[10], tipo[2], texto[100];
+	char fFamily[100], fWeight[100];
+	bool txtstl = false;
 	//char caminho[100];
 
 	Paths *p = pPath;
@@ -132,12 +135,13 @@ void geo_read(path pPath, Lista l)
 	fprintf(arq, "<svg xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">\n");
 	while (!feof(fp))
 	{
+
 		fscanf(fp, "%s", tipo);
 		if (!strcmp(tipo, "c"))
 		{
 			fscanf(fp, "%d %lf %lf %lf %s %s", &id, &x, &y, &r, corb, corp);
 			Form circle = CreateCircle(id, x, y, r, corb, corp);
-			insert(l, circle);
+			insertLst(l, circle);
 			fprintf(arq, "<circle cx=\"%f\" cy=\"%f\" r=\"%f\" fill=\"%s\" stroke=\"%s\" stroke-width=\"1\"/>\n", x, y, r, corp, corb);
 		}
 
@@ -145,7 +149,7 @@ void geo_read(path pPath, Lista l)
 		{
 			fscanf(fp, "%d %lf %lf %lf %lf %s %s", &id, &x, &y, &w, &h, corb, corp);
 			Form rectangle = CreateRect(id, x, y, w, h, corb, corp);
-			insert(l, rectangle);
+			insertLst(l, rectangle);
 			fprintf(arq, "<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" fill=\"%s\" stroke=\"%s\" stroke-width=\"1\"/>\n", x, y, w, h, corp, corb);
 		}
 
@@ -153,16 +157,29 @@ void geo_read(path pPath, Lista l)
 		{
 			fscanf(fp, "%d %lf %lf %lf %lf %s", &id, &x, &y, &x2, &y2, cor);
 			Form line = CreateLine(id, x, y, x2, y2, cor);
-			insert(l, line);
+			insertLst(l, line);
 			fprintf(arq, "<line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" style=\"stroke:%s;stroke-width:1\"/>\n", x, y, x2, y2, cor);
 		}
 
 		if (!strcmp(tipo, "t"))
 		{
-			fscanf(fp, "%d %lf %lf %s %s %s %s", &id, &x, &y, corb, corp, a, texto);
-			Form text = CreateText(id, x, y, corb, corp, a, texto);
-			insert(l, text);
-			fprintf(arq, "<text x=\"%f\" y=\"%f\" fill=\"%s\" stroke=\"%s\" stroke-width=\"1\" font-size=\"20\" text-anchor=\"%s\">%s</text>\n", x, y, corp, corb, a, texto);
+			if (txtstl == true){ //É inserido na lista o txtstl?
+				fscanf(fp, "%d %lf %lf %s %s %s %s", &id, &x, &y, corb, corp, a, texto);
+				Form text = CreateText(id, x, y, corb, corp, a, texto);
+				insertLst(l, text);
+				fprintf(arq, "<text x=\"%f\" y=\"%f\" fill=\"%s\" stroke=\"%s\" stroke-width=\"1\" font-size=\"%f\" font-family=\"%s\" font-weight=\"%s\" text-anchor=\"%s\">%s</text>\n", x, y, corp, corb, fSize, fFamily, fWeight, a, texto);
+			} else {
+				fscanf(fp, "%d %lf %lf %s %s %s %s", &id, &x, &y, corb, corp, a, texto);
+				Form text = CreateText(id, x, y, corb, corp, a, texto);
+				insertLst(l, text);
+				fprintf(arq, "<text x=\"%f\" y=\"%f\" fill=\"%s\" stroke=\"%s\" stroke-width=\"1\" font-size=\"20\" text-anchor=\"%s\">%s</text>\n", x, y, corp, corb, a, texto);}
+			
+		}
+
+		if (!strcmp(tipo, "ts"))
+		{
+			bool txtstl = true;
+			fscanf(fp, "%s %s %lf", fFamily, fWeight, &fSize);
 		}
 	}
 	fprintf(arq, "</svg>");
@@ -170,82 +187,82 @@ void geo_read(path pPath, Lista l)
 	fclose(arq);
 }
 
-void qry_read(path pPath, Lista l){
-	char linha[100];
-	char comando[3];
-	double v, x, y, dx, dy, r;
-	int id, j, k;
+// void qry_read(path pPath, Lista l){
+// 	char linha[100];
+// 	char comando[3];
+// 	double v, x, y, dx, dy, r;
+// 	int id, j, k;
 
-	Paths *p = pPath;
+// 	Paths *p = pPath;
 
-	// printf("QRY: %s", p->PathQry);
+// 	// printf("QRY: %s", p->PathQry);
 
-	FILE *read = fopen(p->PathQry, "r");
+// 	FILE *read = fopen(p->PathQry, "r");
 
-	printf("\n\nQrySVG: %s\n\n", p->QrySVG);
-	FILE *writesvg = fopen(p->QrySVG, "w");
-	FILE *writetxt = fopen(p->GenTxt, "w");
-	fprintf(writesvg, "<svg xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">\n");
-	PrintSVG(l, writesvg);
-	while (!feof(read))
-	{
-		fscanf(read, "%s", comando);
-		if (!strcmp(comando, "na"))
-		{
-			printf("na");
-			//v = na(read, writetxt);
-			fprintf(writetxt, "na: %lf", v);
-		}
-		else if (!strcmp(comando, "tp"))
-		{	
-			fscanf(read, "%lf %lf", &x, &y);
-			tp(writesvg, writetxt, l, x, y);
-		}
-		else if (!strcmp(comando, "tr"))
-		{
-			fscanf(read, "%lf %lf %lf %lf %d", &x, &y, &dx, &dy, &id);
-			fprintf(writetxt, "tr: %lf %lf %lf %lf %d\n", x, y, dx, dy, id);
-			tr(l, x, y, dx, dy, id, writesvg, writetxt);
-		}
-		else if (!strcmp(comando, "be"))
-		{
-			//printf("be");
-			//be(read, writetxt);
-			fscanf(read, "%lf %lf %lf", &x, &y, &r);
-			fprintf(writetxt, "be: %lf %lf %lf\n", x, y, r);
-		}
-		else if (!strcmp(comando, "se"))
-		{
-			//printf("se");
-			//se(read, writetxt);
-			fscanf(read, "%d", &id);
-			fprintf(writetxt, "se: %d\n", id);
-		}
-		else if (!strcmp(comando, "sec"))
-		{
-			//printf("sec");
-			//sec(read, writetxt);
-			fscanf(read, "%d %d", &id, &j);
-			fprintf(writetxt, "sec: %d %d\n", id, j);
-		}
-		else if (!strcmp(comando, "mvh"))
-		{
-			//printf("mvh");
-			//mvh(read, writetxt);
-			fscanf(read, "%d %d %lf", &j, &k, &dx);
-			fprintf(writetxt, "mvh: %d %d %lf\n", j, k, dx);
-		}
-		else if (!strcmp(comando, "mvv"))
-		{
-			//printf("mvv");
-			//mvv(read, writetxt);
-			fscanf(read, "%d %d %lf", &j, &k, &dy);
-			fprintf(writetxt, "mvv: %d %d %lf\n", j, k, dy);
-		}
-	}
-	// PrintSVG(l, writesvg);
-	fprintf(writesvg, "</svg>");
-	fclose(read);
-	fclose(writesvg);
-	fclose(writetxt);
-}
+// 	printf("\n\nQrySVG: %s\n\n", p->QrySVG);
+// 	FILE *writesvg = fopen(p->QrySVG, "w");
+// 	FILE *writetxt = fopen(p->GenTxt, "w");
+// 	fprintf(writesvg, "<svg xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">\n");
+// 	PrintSVG(l, writesvg);
+// 	while (!feof(read))
+// 	{
+// 		fscanf(read, "%s", comando);
+// 		if (!strcmp(comando, "na"))
+// 		{
+// 			printf("na");
+// 			//v = na(read, writetxt);
+// 			fprintf(writetxt, "na: %lf", v);
+// 		}
+// 		else if (!strcmp(comando, "tp"))
+// 		{	
+// 			fscanf(read, "%lf %lf", &x, &y);
+// 			tp(writesvg, writetxt, l, x, y);
+// 		}
+// 		else if (!strcmp(comando, "tr"))
+// 		{
+// 			fscanf(read, "%lf %lf %lf %lf %d", &x, &y, &dx, &dy, &id);
+// 			fprintf(writetxt, "tr: %lf %lf %lf %lf %d\n", x, y, dx, dy, id);
+// 			tr(l, x, y, dx, dy, id, writesvg, writetxt);
+// 		}
+// 		else if (!strcmp(comando, "be"))
+// 		{
+// 			//printf("be");
+// 			//be(read, writetxt);
+// 			fscanf(read, "%lf %lf %lf", &x, &y, &r);
+// 			fprintf(writetxt, "be: %lf %lf %lf\n", x, y, r);
+// 		}
+// 		else if (!strcmp(comando, "se"))
+// 		{
+// 			//printf("se");
+// 			//se(read, writetxt);
+// 			fscanf(read, "%d", &id);
+// 			fprintf(writetxt, "se: %d\n", id);
+// 		}
+// 		else if (!strcmp(comando, "sec"))
+// 		{
+// 			//printf("sec");
+// 			//sec(read, writetxt);
+// 			fscanf(read, "%d %d", &id, &j);
+// 			fprintf(writetxt, "sec: %d %d\n", id, j);
+// 		}
+// 		else if (!strcmp(comando, "mvh"))
+// 		{
+// 			//printf("mvh");
+// 			//mvh(read, writetxt);
+// 			fscanf(read, "%d %d %lf", &j, &k, &dx);
+// 			fprintf(writetxt, "mvh: %d %d %lf\n", j, k, dx);
+// 		}
+// 		else if (!strcmp(comando, "mvv"))
+// 		{
+// 			//printf("mvv");
+// 			//mvv(read, writetxt);
+// 			fscanf(read, "%d %d %lf", &j, &k, &dy);
+// 			fprintf(writetxt, "mvv: %d %d %lf\n", j, k, dy);
+// 		}
+// 	}
+// 	// PrintSVG(l, writesvg);
+// 	fprintf(writesvg, "</svg>");
+// 	fclose(read);
+// 	fclose(writesvg);
+// 	fclose(writetxt);
+// }

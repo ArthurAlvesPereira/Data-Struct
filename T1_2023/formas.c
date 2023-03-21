@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <boolean.h>
+#include <stdbool.h>
+#include <math.h>
 #include "lista.h"
 #include "formas.h"
+
+
 
 typedef struct forma{
     char type;
@@ -24,7 +27,9 @@ typedef struct forma{
     char weight[100];
     int size;
     bool txtstl;
-}
+} Forma;
+
+//mudar char, pois é uma string
 
 Form CreateCircle(int id, double x, double y, double r, char corb[100], char corp[100]){
     Forma *f = (Forma*) calloc(1, sizeof(Forma));
@@ -74,12 +79,111 @@ Form CreateText(int id, double x, double y, char corb[100], char corp[100], char
     strcpy(f->anchor, anchor);
     strcpy(f->text, text);
     return f;
-
-Form TextStyle(Form f, char family[100], char weight[100], int size){
-    Forma *forma = (Forma*) f;
-    strcpy(forma->family, family);
-    strcpy(forma->weight, weight);
-    forma->size = size;
-    forma->txtstl = true;
-    return forma;
 }
+
+Form TextStyle(char family[100], char weight[100], int size){
+    Forma *f = (Forma*) calloc(1, sizeof(Forma));
+    strcpy(f->family, family);
+    strcpy(f->weight, weight);
+    f->size = size;
+    f->txtstl = true;
+    return f;
+}
+
+// Funções para obter informações de uma forma
+
+char GetType(void* l){
+    Forma *f = (Forma*) l;
+    return f->type;
+}
+
+int GetTypeInt(void* l){
+    Forma *f = (Forma*) l;
+    if(f->type == 'c'){
+        return 1;
+    }
+    else if(f->type == 'r'){
+        return 2;
+    }
+    else if(f->type == 'l'){
+        return 3;
+    }
+    else if(f->type == 't'){
+        return 4;
+    }
+    else{
+        return 0;
+    }
+}
+
+int GetId(void* l){
+    Forma *f = (Forma*) l;
+    return f->id;
+}
+
+double GetX(void* l){
+    Forma *f = (Forma*) l;
+    return f->x;
+}
+
+double GetY(void* l){
+    Forma *f = (Forma*) l;
+    return f->y;
+}
+
+double GetR(void* l){
+    Forma *f = (Forma*) l;
+    return f->r;
+}
+
+double GetW(void* l){
+    Forma *f = (Forma*) l;
+    return f->w;
+}
+
+double GetH(void* l){
+    Forma *f = (Forma*) l;
+    return f->h;
+}
+
+double GetX2(void* l){
+    Forma *f = (Forma*) l;
+    return f->x2;
+}
+
+double GetY2(void* l){
+    Forma *f = (Forma*) l;
+    return f->y2;
+}
+
+char* GetText(void* l){
+    Forma *f = (Forma*) l;
+    return f->text;
+}
+
+char* GetAnchor(void* l){
+    Forma *f = (Forma*) l;
+    return f->anchor;
+}
+
+char* GetCorb(void* l){
+    Forma *f = (Forma*) l;
+    return f->corb;
+}
+
+char* GetCorp(void* l){
+    Forma *f = (Forma*) l;
+    return f->corp;
+}
+
+char* GetCor(void* l){
+    Forma *f = (Forma*) l;
+    return f->cor;
+}
+
+double GetLenght(double x1, double y1, double x2, double y2){
+    double lenght = sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
+    return lenght;
+}
+
+

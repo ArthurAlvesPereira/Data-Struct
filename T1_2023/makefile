@@ -5,17 +5,21 @@ PROJECT_NAME = ted
 clear:
 	rm *.o
 	rm $(PROJECT_NAME)
+	rm *.gch
 
-$(PROJECT_NAME): lista.o main.c path.o system.o
-	$(EXEC) $(CFLAGS) lista.o main.c path.o system.o -o $(PROJECT_NAME) -lm
+$(PROJECT_NAME): lista.o main.c path.o system.o formas.o
+	$(EXEC) $(CFLAGS) lista.o main.c path.o system.o formas.o -o $(PROJECT_NAME) -lm
 
 lista.o: lista.c lista.h
-	$(EXEC) $(CFLAGS) -c lista.c lista.h
+	$(EXEC) $(CFLAGS) -c lista.c
 
 path.o: path.c path.h
-	$(EXEC) $(CFLAGS) -c path.c path.h
+	$(EXEC) $(CFLAGS) -c path.c
 
 system.o: system.c system.h
-	$(EXEC) $(CFLAGS) -c system.c system.h
+	$(EXEC) $(CFLAGS) -c system.c
+
+formas.o: formas.c formas.h
+	$(EXEC) $(CFLAGS) -c formas.c
 
 
