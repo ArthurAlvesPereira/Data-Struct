@@ -14,9 +14,11 @@ typedef struct Path
 	char *fullpath;
 	char *path;
 	char *name;
+	char *nomeArq;
 	char *normpath;
 	char *extension;
 	char *BED;
+	char *normpathBED;
 	char *BSD;
 	char *GenGeo;
 	char *GeoSVG;
@@ -40,6 +42,7 @@ void KillPath(void *p)
 	free(path->normpath);
 	free(path->extension);
 	free(path->BED);
+	free(path->normpathBED);
 	free(path->BSD);
 	free(path->GenGeo);
 	free(path->PathQry);
@@ -54,66 +57,70 @@ void KillPath(void *p)
 	free(path);
 }
 
-path readParamter(int argc, char **argv)
-{
-	Paths *p = calloc(1, sizeof(Paths));
-	char *aux;
-	for (int i = 0; i < argc; i++)
-	{
-		if (!strcmp(argv[i], "-e"))
-		{
-			i++;
-			p->BED = calloc(strlen(argv[i]) + 1, sizeof(char));
-			strcpy(p->BED, argv[i]);
-		}
-		else if (!strcmp(argv[i], "-f"))
-		{
-			i++;
-			p->GEO = calloc(strlen(argv[i]) + 1, sizeof(char));
-			strcpy(p->GEO, argv[i]);
-		}
-		else if (!strcmp(argv[i], "-o"))
-		{
-			i++;
-			p->BSD = calloc(strlen(argv[i]) + 1, sizeof(char));
-			strcpy(p->BSD, argv[i]);
-		}
-		else if (!strcmp(argv[i], "-q"))
-		{
-			i++;
-			p->QRY = calloc(strlen(argv[i]) + 1, sizeof(char));
-			strcpy(p->QRY, argv[i]);
-		}
-	}
-	p->path = calloc(strlen(p->BED) + 2, sizeof(char));
-	normalizePath(p->BED, p->path, 50);
-	p->fullpath = calloc(strlen(p->path) + strlen(p->GEO) + 2, sizeof(char));
-	joinFilePath(p->path, p->GEO, p->fullpath, strlen(p->path) + strlen(p->GEO) + 5);
-	p->name = calloc(strlen(p->GEO) + 1, sizeof(char));
-	p->extension = calloc(4, sizeof(char));
-	splitPath(p->fullpath, p->path, strlen(p->fullpath), p->name, strlen(p->name), p->extension, strlen(p->extension));
-	p->GeoSVG = calloc(strlen(p->fullpath) + 5, sizeof(char));
-	p->SVG = calloc(5, sizeof(char));
-	p->TXT = calloc(5, sizeof(char));
-	p->PathQry = calloc(strlen(p->fullpath) + strlen(p->QRY), sizeof(char));
-	p->GenTxt = calloc(strlen(p->fullpath) + 5, sizeof(char));
-	p->QrySVG = calloc(strlen(p->fullpath) + 8, sizeof(char));
-	p->nameQry = calloc(strlen(p->QRY) + 6, sizeof(char));
-	strcpy(p->nameQry, p->name);
-	strcat(p->nameQry, "-arqcons");
-	strcpy(p->TXT, ".txt");
-	strcpy(p->SVG, ".svg");
-	printf("%s\n", p->QRY);
-	//getPath(p->QRY, p->, strlen(p->fullpath) + 5);
-	joinAll(p->BSD, p->name, p->SVG, p->GeoSVG, strlen(p->path) + strlen(p->name) + 4);
-	joinFilePath(p->path, p->QRY, p->PathQry, strlen(p->path) + strlen(p->QRY) + strlen(p->PathQry));
-	joinAll(p->BSD, p->name, p->TXT, p->GenTxt, strlen(p->path) + strlen(p->name) + 4);
-	joinAll(p->BSD, p->nameQry, p->SVG, p->QrySVG, strlen(p->path) + strlen(p->nameQry) + 4);
-	joinAll(p->BSD, p->name, p->TXT, p->GenTxt, strlen(p->path) + strlen(p->name) + 4);
+// path readParamter(int argc, char **argv)
+// {
+// 	printf("TESTE!!!!!\n");
+
+// 	Paths *p = calloc(1, sizeof(Paths));
+// 	char *aux;
+// 	for (int i = 0; i < argc; i++)
+// 	{
+// 		if (!strcmp(argv[i], "-e"))
+// 		{
+// 			i++;
+// 			p->BED = calloc(strlen(argv[i]) + 1, sizeof(char));
+// 			strcpy(p->BED, argv[i]);
+// 		}
+// 		else if (!strcmp(argv[i], "-f"))
+// 		{
+// 			i++;
+// 			p->GEO = calloc(strlen(argv[i]) + 1, sizeof(char));
+// 			strcpy(p->GEO, argv[i]);
+// 		}
+// 		else if (!strcmp(argv[i], "-o"))
+// 		{
+// 			i++;
+// 			p->BSD = calloc(strlen(argv[i]) + 1, sizeof(char));
+// 			strcpy(p->BSD, argv[i]);
+// 		}
+// 		else if (!strcmp(argv[i], "-q"))
+// 		{
+// 			i++;
+// 			p->QRY = calloc(strlen(argv[i]) + 1, sizeof(char));
+// 			strcpy(p->QRY, argv[i]);
+// 		}
+// 	}
+	
+// 	p->path = calloc(strlen(p->BED) + 2, sizeof(char));
+// 	normalizePath(p->BED, p->path, 50);
+// 	p->fullpath = calloc(strlen(p->path) + strlen(p->GEO) + 2, sizeof(char));
+// 	joinFilePath(p->path, p->GEO, p->fullpath, strlen(p->path) + strlen(p->GEO) + 5);
+// 	p->name = calloc(strlen(p->GEO) + 1, sizeof(char));
+// 	p->extension = calloc(4, sizeof(char));
+// 	splitPath(p->fullpath, p->path, strlen(p->fullpath), p->name, strlen(p->name), p->extension, strlen(p->extension));
+// 	p->GeoSVG = calloc(strlen(p->fullpath) + 5, sizeof(char));
+	
+// 	p->SVG = calloc(5, sizeof(char));
+// 	p->TXT = calloc(5, sizeof(char));
+// 	// p->PathQry = calloc(strlen(p->fullpath) + strlen(p->QRY), sizeof(char));
+// 	// p->GenTxt = calloc(strlen(p->fullpath) + 5, sizeof(char));
+// 	// p->QrySVG = calloc(strlen(p->fullpath) + 8, sizeof(char));
+// 	// p->nameQry = calloc(strlen(p->QRY) + 6, sizeof(char));
+// 	// strcpy(p->nameQry, p->name);
+// 	// strcat(p->nameQry, "-arqcons");
+// 	// strcpy(p->TXT, ".txt");
+// 	strcpy(p->SVG, ".svg");
+// 	// printf("%s\n", p->QRY);
+// 	//getPath(p->QRY, p->, strlen(p->fullpath) + 5);
+// 	joinAll(p->BSD, p->name, p->SVG, p->GeoSVG, strlen(p->path) + strlen(p->name) + 4);
+// 	// joinFilePath(p->path, p->QRY, p->PathQry, strlen(p->path) + strlen(p->QRY) + strlen(p->PathQry));
+// 	// joinAll(p->BSD, p->name, p->TXT, p->GenTxt, strlen(p->path) + strlen(p->name) + 4);
+// 	// joinAll(p->BSD, p->nameQry, p->SVG, p->QrySVG, strlen(p->path) + strlen(p->nameQry) + 4);
+// 	// joinAll(p->BSD, p->name, p->TXT, p->GenTxt, strlen(p->path) + strlen(p->name) + 4);
 
 
-	return p;
-}
+// 	return p;
+// }
 
 void geo_read(path pPath, Lista l)
 {
@@ -125,13 +132,22 @@ void geo_read(path pPath, Lista l)
 	//char caminho[100];
 
 	Paths *p = pPath;
+
 	//strcpy(caminho, p->fullpath);
-	printf("%s\n", p->fullpath);
-	printf("%s\n", p->GeoSVG);
+	// printf("%s\n", p->fullpath);
+	printf("%s\n", p->GEO);
 
-	FILE *arq = fopen(p->GeoSVG, "w");
+	printf("!!!!!!!!!!!AQUI!!!!!!!!1\n\n");
 
-	FILE *fp = fopen(p->fullpath, "r");
+	FILE *arq = fopen("Teste.svg", "w");
+
+	FILE *fp = fopen(p->GEO, "r");
+
+	if (fp == NULL)
+	{
+		printf("Erro ao abrir o arquivo!\n");
+		exit(1);
+	}
 	fprintf(arq, "<svg xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">\n");
 	while (!feof(fp))
 	{
@@ -163,16 +179,16 @@ void geo_read(path pPath, Lista l)
 
 		if (!strcmp(tipo, "t"))
 		{
-			if (txtstl == true){ //É inserido na lista o txtstl?
+			// if (txtstl == true){ //É inserido na lista o txtstl?
+			// 	fscanf(fp, "%d %lf %lf %s %s %s %s", &id, &x, &y, corb, corp, a, texto);
+			// 	Form text = CreateText(id, x, y, corb, corp, a, texto);
+			// 	insertLst(l, text);
+			// 	fprintf(arq, "<text x=\"%f\" y=\"%f\" fill=\"%s\" stroke=\"%s\" stroke-width=\"1\" font-size=\"%f\" font-family=\"%s\" font-weight=\"%s\" text-anchor=\"%s\">%s</text>\n", x, y, corp, corb, fSize, fFamily, fWeight, a, texto);
+			// } else {
 				fscanf(fp, "%d %lf %lf %s %s %s %s", &id, &x, &y, corb, corp, a, texto);
 				Form text = CreateText(id, x, y, corb, corp, a, texto);
 				insertLst(l, text);
-				fprintf(arq, "<text x=\"%f\" y=\"%f\" fill=\"%s\" stroke=\"%s\" stroke-width=\"1\" font-size=\"%f\" font-family=\"%s\" font-weight=\"%s\" text-anchor=\"%s\">%s</text>\n", x, y, corp, corb, fSize, fFamily, fWeight, a, texto);
-			} else {
-				fscanf(fp, "%d %lf %lf %s %s %s %s", &id, &x, &y, corb, corp, a, texto);
-				Form text = CreateText(id, x, y, corb, corp, a, texto);
-				insertLst(l, text);
-				fprintf(arq, "<text x=\"%f\" y=\"%f\" fill=\"%s\" stroke=\"%s\" stroke-width=\"1\" font-size=\"20\" text-anchor=\"%s\">%s</text>\n", x, y, corp, corb, a, texto);}
+				fprintf(arq, "<text x=\"%f\" y=\"%f\" fill=\"%s\" stroke=\"%s\" stroke-width=\"1\" font-size=\"20\" text-anchor=\"%s\">%s</text>\n", x, y, corp, corb, a, texto);
 			
 		}
 
@@ -207,11 +223,9 @@ void geo_read(path pPath, Lista l)
 // 	while (!feof(read))
 // 	{
 // 		fscanf(read, "%s", comando);
-// 		if (!strcmp(comando, "na"))
+// 		if (!strcmp(comando, "mv"))
 // 		{
-// 			printf("na");
-// 			//v = na(read, writetxt);
-// 			fprintf(writetxt, "na: %lf", v);
+// 			fscanf()
 // 		}
 // 		else if (!strcmp(comando, "tp"))
 // 		{	
@@ -266,3 +280,61 @@ void geo_read(path pPath, Lista l)
 // 	fclose(writesvg);
 // 	fclose(writetxt);
 // }
+
+
+path readParamter(int argc, char **argv){
+	Paths *p = calloc(1, sizeof(Paths));
+	char *aux;
+	bool arg_e = false;
+	for (int i = 0; i < argc; i++)
+	{
+		if (!strcmp(argv[i], "-e"))
+		{
+			i++;
+			p->BED = argv[i];
+			normalizePath(p->BED, p->normpathBED, strlen(p->BED));
+			arg_e = true;
+
+		} else if (!strcmp(argv[i], "-f")){
+			i++;
+			p->GEO = argv[i];
+
+
+		} else if (!strcmp(argv[i], "-o")){
+			i++;
+			p->BSD = argv[i];
+		} else if(!strcmp(argv[i], "-q")){
+			i++;
+			p->QRY = argv[i];
+		}
+	}
+
+	if (arg_e == false)
+	{
+		p->path = calloc(strlen(p->GEO) + 1, sizeof(char));
+		p->nomeArq = calloc(strlen(p->GEO) + 1, sizeof(char));
+		p->extension = calloc(strlen(p->GEO) + 1, sizeof(char));
+		splitPath(p->GEO, p->path, strlen(p->path), p->nomeArq, strlen(p->nomeArq), p->extension, strlen(p->extension));
+
+		printf("path: %s\n", p->path);
+		printf("nomeArq: %s\n", p->nomeArq);
+		printf("extension: %s\n", p->extension);
+	}
+
+	if (p->BED != NULL)
+	{
+		joinFilePath(p->normpathBED, p->GEO, p->BED, strlen(p->BED));
+		// joinAll(p->normpathBED, p->GEO, "txt");
+	}
+	printf("BED: %s\n", p->BED);
+	printf("GEO: %s\n", p->GEO);
+	printf("BSD: %s\n", p->BSD);
+	// printf("Qry: %s\n", p->QRY);
+
+
+
+	// paths
+
+	return p;
+
+}
