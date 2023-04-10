@@ -74,23 +74,58 @@ Item pop(Lista l){
 
 void remover(Lista l, Posic p){
     List *list = (List*) l;
-    Node *n = (Node*) p;
+    Node *n = p;
     Node *aux = list->head;
-    if (aux == n)
+    Node *prev = NULL;
+    Node *aux2;
+    int i = 1;
+
+    while (aux != n)
     {
-      list->head = n->next;
-      free(n);
-      list->size--;
-      return;
-    }
-    while (aux->next != n)
-    {
+      prev = aux;
       aux = aux->next;
     }
-    aux->next = n->next;
-    free(n);
+    aux2 = aux->next;
+    prev->next = aux2;
+    aux->next = NULL;
+    
+    free(aux->info);
+    free(aux->next);
+    free(aux);
+    //free(aux->info);
+    //free(aux2);
     list->size--;
+    // free(n);
 }
+
+    
+//     while (list != NULL && aux->info != n)
+//     {
+//       aux = aux->next;
+//     }
+//     if (list != NULL)
+//     {
+//       aux->next = n->next;
+//       free(n);
+//       list->size--;
+//     }
+// } 
+    
+//     if (aux == n)
+//     {
+//       list->head = n->next;
+//       free(n);
+//       list->size--;
+//       return;
+//     }
+//     while (aux->next != n)
+//     {
+//       aux = aux->next;
+//     }
+//     aux->next = n->next;
+//     free(n);
+//     list->size--;
+// }
 
 Item get(Lista l, Posic p){
     Node *n = (Node*) p;

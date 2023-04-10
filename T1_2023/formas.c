@@ -92,6 +92,7 @@ Form TextStyle(char family[100], char weight[100], int size){
 
 // Funções para obter informações de uma forma
 
+
 char GetType(void* l){
     Forma *f = (Forma*) l;
     return f->type;
@@ -186,4 +187,10 @@ double GetLenght(double x1, double y1, double x2, double y2){
     return lenght;
 }
 
+//Sets
 
+double SetX(void* l, double x, double dx){
+    Forma *f = (Forma*) l;
+    f->x = x + dx;
+    return f->x;
+}

@@ -85,3 +85,17 @@ void splitPath(char *fullPath, char *path, int lenPath, char *nomeArq, int lenNo
 		nomeArq = strtok(nomeArq, ".");
 	}
 }
+
+void getPath(char *fullPath, char *path, int lenPath)
+{
+	char *bar = strrchr(fullPath, '/');
+	if (bar)
+	{
+		strcpy(path, fullPath);
+		path[bar - fullPath] = '\0';
+	}
+	else
+	{
+		strcpy(path, "");
+	}
+}
