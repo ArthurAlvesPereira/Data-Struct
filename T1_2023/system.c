@@ -16,10 +16,11 @@ typedef struct Path
 	char *name;
 	char *nomeArq;
 	char *normpath;
-	char *extension;
+	char extension[5];
 	char *BED;
 	char *normpathBED;
 	char *BSD;
+	char *normpathBSD;
 	char *GenGeo;
 	char *GeoSVG;
 	char *PathQry;
@@ -139,7 +140,7 @@ void geo_read(path pPath, Lista l)
 
 	printf("!!!!!!!!!!!AQUI!!!!!!!!1\n\n");
 
-	FILE *arq = fopen("Teste.svg", "w");
+	FILE *arq = fopen(p->GeoSVG, "w");
 
 	FILE *fp = fopen(p->GEO, "r");
 
@@ -179,22 +180,28 @@ void geo_read(path pPath, Lista l)
 
 		if (!strcmp(tipo, "t"))
 		{
-			// if (txtstl == true){ //É inserido na lista o txtstl?
-			// 	fscanf(fp, "%d %lf %lf %s %s %s %s", &id, &x, &y, corb, corp, a, texto);
-			// 	Form text = CreateText(id, x, y, corb, corp, a, texto);
-			// 	insertLst(l, text);
-			// 	fprintf(arq, "<text x=\"%f\" y=\"%f\" fill=\"%s\" stroke=\"%s\" stroke-width=\"1\" font-size=\"%f\" font-family=\"%s\" font-weight=\"%s\" text-anchor=\"%s\">%s</text>\n", x, y, corp, corb, fSize, fFamily, fWeight, a, texto);
-			// } else {
+
+
+			if (txtstl == true){ //É inserido na lista o txtstl?
 				fscanf(fp, "%d %lf %lf %s %s %s %s", &id, &x, &y, corb, corp, a, texto);
 				Form text = CreateText(id, x, y, corb, corp, a, texto);
 				insertLst(l, text);
+				printf("%s %s %lf" , fFamily, fWeight, fSize);
+				fprintf(arq, "<text x=\"%f\" y=\"%f\" fill=\"%s\" stroke=\"%s\" stroke-width=\"1\" font-size=\"%f\" font-family=\"%s\" font-weight=\"%s\" text-anchor=\"%s\">%s</text>\n", x, y, corp, corb, fSize, fFamily, fWeight, a, texto);
+			} else {
+				fscanf(fp, "%d %lf %lf %s %s %s %s", &id, &x, &y, corb, corp, a, texto);
+				Form text = CreateText(id, x, y, corb, corp, a, texto);
+				insertLst(l, text);
+				printf("\n\nCADE O ISTUAILO?\n\n");
 				fprintf(arq, "<text x=\"%f\" y=\"%f\" fill=\"%s\" stroke=\"%s\" stroke-width=\"1\" font-size=\"20\" text-anchor=\"%s\">%s</text>\n", x, y, corp, corb, a, texto);
-			
+		}
 		}
 
 		if (!strcmp(tipo, "ts"))
 		{
-			bool txtstl = true;
+			printf("ENTROU NO TS\n");
+			txtstl = true;
+
 			fscanf(fp, "%s %s %lf", fFamily, fWeight, &fSize);
 		}
 	}
@@ -286,6 +293,7 @@ path readParamter(int argc, char **argv){
 	Paths *p = calloc(1, sizeof(Paths));
 	char *aux;
 	bool arg_e = false;
+	bool arg_q = false;
 	for (int i = 0; i < argc; i++)
 	{
 		if (!strcmp(argv[i], "-e"))
@@ -303,6 +311,7 @@ path readParamter(int argc, char **argv){
 		} else if (!strcmp(argv[i], "-o")){
 			i++;
 			p->BSD = argv[i];
+			p->normpathBSD = calloc(strlen(p->BSD) + 1, sizeof(char));
 		} else if(!strcmp(argv[i], "-q")){
 			i++;
 			p->QRY = argv[i];
@@ -313,22 +322,27 @@ path readParamter(int argc, char **argv){
 	{
 		p->path = calloc(strlen(p->GEO) + 1, sizeof(char));
 		p->nomeArq = calloc(strlen(p->GEO) + 1, sizeof(char));
-		p->extension = calloc(strlen(p->GEO) + 1, sizeof(char));
+		// p->extension = calloc(strlen(p->GEO) + 1, sizeof(char));
 		splitPath(p->GEO, p->path, strlen(p->path), p->nomeArq, strlen(p->nomeArq), p->extension, strlen(p->extension));
 
 		printf("path: %s\n", p->path);
 		printf("nomeArq: %s\n", p->nomeArq);
 		printf("extension: %s\n", p->extension);
-	}
+	} else {}
 
-	if (p->BED != NULL)
-	{
-		joinFilePath(p->normpathBED, p->GEO, p->BED, strlen(p->BED));
-		// joinAll(p->normpathBED, p->GEO, "txt");
-	}
+	normalizePath(p->BSD, p->normpathBSD, strlen(p->BSD));
+	printf("normpathBSD: %s\n", p->normpathBSD);
+	p->GeoSVG = calloc(strlen(p->BSD) + strlen(p->nomeArq) + 5, sizeof(char));
+	strcpy(p->GeoSVG, p->normpathBSD);
+	strcat(p->GeoSVG, "/");//normalizar
+	strcat(p->GeoSVG, p->nomeArq);
+	strcat(p->GeoSVG, ".svg");
+
+	
 	printf("BED: %s\n", p->BED);
 	printf("GEO: %s\n", p->GEO);
 	printf("BSD: %s\n", p->BSD);
+	printf("GeoSVG: %s\n", p->GeoSVG);
 	// printf("Qry: %s\n", p->QRY);
 
 

@@ -8,9 +8,9 @@ void normalizePath(char *path, char *normPath, int lenNormPath)
 
 	if (path[lenNormPath-1] == '/')
 	{
-		normPath = path;
+		strcpy(normPath, path);
 		normPath[lenNormPath-1] = '\0';
-
+		printf("!!!!!!!!\nTESTE BARRA!!!!!!!!\n");
 	}
 	else
 	{
@@ -69,43 +69,29 @@ void joinFilePath(char *path, char *fileName, char *fullPath, int lenFullPath)
 
 void splitPath(char *fullPath, char *path, int lenPath, char *nomeArq, int lenNomeArq, char *extArq, int lenExtArq)
 {
-	int bar, dot;
-	int fullPathLen = strlen(fullPath);
-
-	for (int i = 0; i < fullPathLen; i++){
-		if (fullPath[i] == '/'){
-			bar = i;
-		}
+	char *bar = strrchr(fullPath, '/');
+	if (bar)
+	{
+		strcpy(path, fullPath);
+		path[bar - fullPath] = '\0';
+		strcpy(nomeArq, bar + 1);
+	}
+	else
+	{
+		strcpy(path, "");
+		strcpy(nomeArq, fullPath);
 	}
 
-	if (bar >= 0){
-		strncpy(path, fullPath, bar);
-		path[bar] = '\0';
+	char *dot = strrchr(nomeArq, '.');
+	if (dot)
+	{
+		strcpy(extArq, dot + 1);
+		nomeArq[dot - nomeArq] = '\0';
 	}
-
-	for (int i = fullPathLen - 1; i >= 0; i--){
-		if (fullPath[i] == '.'){
-			dot = i;
-			break;
-		} else if (fullPath[i] == '/'){
-			break;
-		}
+	else
+	{
+		strcpy(extArq, "");
 	}
-
-	if(dot > bar) {
-		strncpy(nomeArq, fullPath + bar + 1, dot - bar - 1);
-		nomeArq[dot - bar - 1] = '\0';
-	} else {
-		strncpy(nomeArq, fullPath + bar + 1, fullPathLen - bar -1);
-		nomeArq[fullPathLen - bar - 1];
-	}
-
-	if (dot >= 0) {
-        strncpy(extArq, fullPath + dot, lenExtArq - 1);
-        extArq[lenExtArq - 1] = '\0';
-    } else {
-        extArq[0] = '\0';
-    }
 }
 
 void getPath(char *fullPath, char *path, int lenPath)
