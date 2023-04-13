@@ -189,8 +189,17 @@ double GetLenght(double x1, double y1, double x2, double y2){
 
 //Sets
 
-double SetX(void* l, double x, double dx){
+double SetX(void* l, double dx){
+    double x;
     Forma *f = (Forma*) l;
     f->x = x + dx;
     return f->x;
 }
+
+double SetY(void* l, double dy){
+    double y;
+    Forma *f = (Forma*) l;
+    f->y = y + dy;
+    return f->y;
+}
+

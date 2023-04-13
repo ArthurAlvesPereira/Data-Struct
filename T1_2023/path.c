@@ -5,19 +5,15 @@
 
 void normalizePath(char *path, char *normPath, int lenNormPath)
 {
-
 	if (path[lenNormPath-1] == '/')
 	{
 		strcpy(normPath, path);
 		normPath[lenNormPath-1] = '\0';
-		printf("!!!!!!!!\nTESTE BARRA!!!!!!!!\n");
+		
 	}
 	else
 	{
-
-		normPath = path;
-						printf("!!!!!!!!\nTESTE BARRA!!!!!!!!\n");
-
+		strcpy(normPath, path);
 	}
 }
 
@@ -57,6 +53,8 @@ void joinFilePath(char *path, char *fileName, char *fullPath, int lenFullPath)
 
 	strcpy(fullPath, path);
 
+	// printf("fullPath: %s", fullPath);
+
 	if (path[strlen(path) - 1] != '/')
 	{
 		strcat(fullPath, "/");
@@ -70,8 +68,16 @@ void joinFilePath(char *path, char *fileName, char *fullPath, int lenFullPath)
 void splitPath(char *fullPath, char *path, int lenPath, char *nomeArq, int lenNomeArq, char *extArq, int lenExtArq)
 {
 	char *bar = strrchr(fullPath, '/');
+
+	printf("fullPath: %s", fullPath);
+	printf("\nfullPath address: %p", fullPath);
+
+	printf("\npath: %s", path);
+	printf("\npath address: %p", path);
+
 	if (bar)
 	{
+		printf("\n\n%s\n\n", path);
 		strcpy(path, fullPath);
 		path[bar - fullPath] = '\0';
 		strcpy(nomeArq, bar + 1);

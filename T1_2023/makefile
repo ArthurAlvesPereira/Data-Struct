@@ -7,8 +7,8 @@ clear:
 	rm $(PROJECT_NAME)
 	rm *.gch
 
-$(PROJECT_NAME): lista.o main.c path.o system.o formas.o
-	$(EXEC) $(CFLAGS) lista.o main.c path.o system.o formas.o -o $(PROJECT_NAME) -lm
+$(PROJECT_NAME): lista.o main.c path.o system.o formas.o qry.o
+	$(EXEC) $(CFLAGS) lista.o main.c path.o system.o formas.o qry.o -o $(PROJECT_NAME) -lm
 
 lista.o: lista.c lista.h
 	$(EXEC) $(CFLAGS) -c lista.c
@@ -21,5 +21,8 @@ system.o: system.c system.h
 
 formas.o: formas.c formas.h
 	$(EXEC) $(CFLAGS) -c formas.c
+
+qry.o: qry.c qry.h
+	$(EXEC) $(CFLAGS) -c qry.c
 
 

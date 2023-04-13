@@ -26,4 +26,8 @@ char* GetCorp(void* l);
 char* GetCor(void* l);
 double GetLength(double x1, double y1, double x2, double y2);
 
+double SetX(void* l, double dx);
+double SetY(void* l, double dy);
+void SetR(void* l, double r);
+
 #endif

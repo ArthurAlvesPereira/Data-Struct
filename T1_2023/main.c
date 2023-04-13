@@ -21,6 +21,8 @@ int main(int argc, char **argv)
 
     geo_read(p, l);
 
+    qry_read(p, l);
+
     killLst(l);
     // KillPath(p);
 

@@ -6,7 +6,7 @@
 #include "path.h"
 #include "system.h"
 #include "formas.h"
-// #include "qry.h"
+#include "qry.h"
 // #include "svg.h"
 
 typedef struct Path
@@ -27,6 +27,7 @@ typedef struct Path
 	char *GenTxt;
 	char *QrySVG;
 	char *nameQry;
+	char *GenQry;
 	char *QRY;
 	char *GEO;
 	char *SVG;
@@ -140,11 +141,19 @@ void geo_read(path pPath, Lista l)
 
 	printf("!!!!!!!!!!!AQUI!!!!!!!!1\n\n");
 
+	printf("%s\n", p->GeoSVG);
+
 	FILE *arq = fopen(p->GeoSVG, "w");
 
-	FILE *fp = fopen(p->GEO, "r");
+	FILE *fp = fopen(p->GenGeo, "r");
 
 	if (fp == NULL)
+	{
+		printf("Erro ao abrir o arquivo!\n");
+		exit(1);
+	}
+
+	if (arq == NULL)
 	{
 		printf("Erro ao abrir o arquivo!\n");
 		exit(1);
@@ -210,83 +219,88 @@ void geo_read(path pPath, Lista l)
 	fclose(arq);
 }
 
-// void qry_read(path pPath, Lista l){
-// 	char linha[100];
-// 	char comando[3];
-// 	double v, x, y, dx, dy, r;
-// 	int id, j, k;
+void qry_read(path pPath, Lista l){
+	char linha[100];
+	char comando[3];
+	char sufixo[100];
+	char capac;
+	double v, x, y, dx, dy, r, d, h, dist;
+	int id, j, k, list;
 
-// 	Paths *p = pPath;
+	Paths *p = pPath;
 
-// 	// printf("QRY: %s", p->PathQry);
+	printf("QRY: %s\n\n", p->PathQry);
 
-// 	FILE *read = fopen(p->PathQry, "r");
+	printf("QrySVG: %s\n\n", p->QrySVG);
 
-// 	printf("\n\nQrySVG: %s\n\n", p->QrySVG);
-// 	FILE *writesvg = fopen(p->QrySVG, "w");
-// 	FILE *writetxt = fopen(p->GenTxt, "w");
-// 	fprintf(writesvg, "<svg xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">\n");
-// 	PrintSVG(l, writesvg);
-// 	while (!feof(read))
-// 	{
-// 		fscanf(read, "%s", comando);
-// 		if (!strcmp(comando, "mv"))
-// 		{
-// 			fscanf()
-// 		}
-// 		else if (!strcmp(comando, "tp"))
-// 		{	
-// 			fscanf(read, "%lf %lf", &x, &y);
-// 			tp(writesvg, writetxt, l, x, y);
-// 		}
-// 		else if (!strcmp(comando, "tr"))
-// 		{
-// 			fscanf(read, "%lf %lf %lf %lf %d", &x, &y, &dx, &dy, &id);
-// 			fprintf(writetxt, "tr: %lf %lf %lf %lf %d\n", x, y, dx, dy, id);
-// 			tr(l, x, y, dx, dy, id, writesvg, writetxt);
-// 		}
-// 		else if (!strcmp(comando, "be"))
-// 		{
-// 			//printf("be");
-// 			//be(read, writetxt);
-// 			fscanf(read, "%lf %lf %lf", &x, &y, &r);
-// 			fprintf(writetxt, "be: %lf %lf %lf\n", x, y, r);
-// 		}
-// 		else if (!strcmp(comando, "se"))
-// 		{
-// 			//printf("se");
-// 			//se(read, writetxt);
-// 			fscanf(read, "%d", &id);
-// 			fprintf(writetxt, "se: %d\n", id);
-// 		}
-// 		else if (!strcmp(comando, "sec"))
-// 		{
-// 			//printf("sec");
-// 			//sec(read, writetxt);
-// 			fscanf(read, "%d %d", &id, &j);
-// 			fprintf(writetxt, "sec: %d %d\n", id, j);
-// 		}
-// 		else if (!strcmp(comando, "mvh"))
-// 		{
-// 			//printf("mvh");
-// 			//mvh(read, writetxt);
-// 			fscanf(read, "%d %d %lf", &j, &k, &dx);
-// 			fprintf(writetxt, "mvh: %d %d %lf\n", j, k, dx);
-// 		}
-// 		else if (!strcmp(comando, "mvv"))
-// 		{
-// 			//printf("mvv");
-// 			//mvv(read, writetxt);
-// 			fscanf(read, "%d %d %lf", &j, &k, &dy);
-// 			fprintf(writetxt, "mvv: %d %d %lf\n", j, k, dy);
-// 		}
-// 	}
-// 	// PrintSVG(l, writesvg);
-// 	fprintf(writesvg, "</svg>");
-// 	fclose(read);
-// 	fclose(writesvg);
-// 	fclose(writetxt);
-// }
+	FILE *read = fopen(p->PathQry, "r");
+
+	if (read == NULL)
+	{
+		printf("Erro ao abrir o arquivo!\n");
+		exit(1);
+	}
+
+	printf("\n\nQrySVG: %s\n\n", p->QrySVG);
+	FILE *writesvg = fopen(p->QrySVG, "w");
+	FILE *writetxt = fopen(p->GenTxt, "w");
+	fprintf(writesvg, "<svg xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">\n");
+	// PrintSVG(l, writesvg);
+	exit(1);
+	while (!feof(read))
+	{
+		fscanf(read, "%s", comando);
+		if (!strcmp(comando, "mv"))
+		{
+			fscanf(read, "%d %lf %lf", &id, &dx, &dy);
+			mv(id, dx, dy, writetxt, writesvg, l);
+		}
+
+		if (!strcmp(comando, "g"))
+		{
+			fscanf(read, "%d %lf", &id, &v);
+			// g(id, v, writetxt, writesvg, l);
+			printf("funcao g nao implementada\n");
+		}
+
+		if (!strcmp(comando, "ff"))
+		{
+			fscanf(read, "%d %lf %lf %lf", &id, &r, &d, &h);
+			// ff(id, r, d, h, writetxt, writesvg, l);
+			printf("funcao ff nao implementada\n");
+		}
+
+		if (!strcmp(comando, "tf")){
+			fscanf(read, "%d %d", &id, &list);
+			printf("funcao tf nao implementada\n");
+		}
+
+		if (!strcmp(comando, "df")){
+			fscanf(read, "%d %d %s", &id, &list, sufixo);
+			printf("funcao df nao implementada\n");
+		}
+
+		if (!strcmp(comando, "d")){
+			fscanf(read, "%d %c %lf %d %lf", &id, &capac, &dist, &j, &dx);
+			// d(id, writetxt, writesvg, l);
+			printf("funcao d nao implementada\n");
+		}
+
+		if (!strcmp(comando, "b?")){
+			printf("funcao b? nao implementada\n");
+		}
+
+		if (!strcmp(comando, "c?")){
+			printf("funcao c? nao implementada\n");
+		}
+		
+	// PrintSVG(l, writesvg);
+	fprintf(writesvg, "</svg>");
+	fclose(read);
+	fclose(writesvg);
+	fclose(writetxt);
+	}
+}
 
 
 path readParamter(int argc, char **argv){
@@ -300,7 +314,7 @@ path readParamter(int argc, char **argv){
 		{
 			i++;
 			p->BED = argv[i];
-			normalizePath(p->BED, p->normpathBED, strlen(p->BED));
+			// normalizePath(p->BED, p->normpathBED, strlen(p->BED));
 			arg_e = true;
 
 		} else if (!strcmp(argv[i], "-f")){
@@ -315,6 +329,7 @@ path readParamter(int argc, char **argv){
 		} else if(!strcmp(argv[i], "-q")){
 			i++;
 			p->QRY = argv[i];
+			arg_q = true;
 		}
 	}
 
@@ -325,18 +340,119 @@ path readParamter(int argc, char **argv){
 		// p->extension = calloc(strlen(p->GEO) + 1, sizeof(char));
 		splitPath(p->GEO, p->path, strlen(p->path), p->nomeArq, strlen(p->nomeArq), p->extension, strlen(p->extension));
 
+		p->GenGeo = calloc(strlen(p->path) + strlen(p->nomeArq) + 5, sizeof(char));
+		strcpy(p->GenGeo, p->GEO);
+		if (arg_q == true)
+		{
+			
+			printf("\n\n\nE AQUI TA LENDO???\n\n\n");
+
+			// splitPath(p->QRY, p->path, strlen(p->path), p->nomeArq, strlen(p->nomeArq), p->extension, strlen(p->extension));
+
+			// printf("path: %s\n", p->path);
+			// printf("nomeArq: %s\n", p->nomeArq);
+			// printf("extension: %s\n", p->extension);
+
+			p->PathQry = calloc(strlen(p->QRY) + 1, sizeof(char));
+
+			strcpy(p->PathQry, p->QRY);
+		}
+	} else {
+		p->path = calloc(strlen(p->BED) * 2, sizeof(char));
+		p->nomeArq = calloc(strlen(p->GEO) + 1, sizeof(char));
+		p->normpathBED = calloc(strlen(p->BED) + 1, sizeof(char));
+		normalizePath(p->BED, p->normpathBED, strlen(p->BED));
+
+		printf("normpathBED: %s\n", p->normpathBED);
+
+		p->fullpath = calloc(strlen(p->BED) + strlen(p->GEO) + 5, sizeof(char));
+		joinFilePath(p->normpathBED, p->GEO, p->fullpath, strlen(p->normpathBED) + strlen(p->GEO) + 5);
+
+		// printf("normpathBED: %s\n", p->normpathBED);
+		// printf("GEO: %s\n", p->GEO);
+
+		// printf("\n\n\nCADEO GEO???\n\n\n");
+		// printf("fullpath: %s\n", p->fullpath);
+
+		// printf("fullpath: %s\n", p->fullpath);
+		// printf("fullpath address: %p\n", p->fullpath);
+		// printf("fullpath size: %d\n", strlen(p->fullpath));
+
+		// printf("path: %s\n", p->path);
+		// printf("path address: %p\n", p->path);
+		// printf("path size: %d\n", strlen(p->path));
+
+		// printf("nomeArq: %s\n", p->nomeArq);
+		// printf("nomeArq address: %p\n", p->nomeArq);
+		// printf("nomeArq size: %d\n", strlen(p->nomeArq));
+
+		// printf("extension: %s\n", p->extension);
+		// printf("extension address: %p\n", p->extension);
+		// printf("extension size: %d\n", strlen(p->extension));
+
+		splitPath(p->fullpath, p->path, strlen(p->path), p->nomeArq, strlen(p->nomeArq), p->extension, strlen(p->extension));
+
+		printf("\n\n\n COMEÇO DEBUG\n\n\n");
 		printf("path: %s\n", p->path);
 		printf("nomeArq: %s\n", p->nomeArq);
 		printf("extension: %s\n", p->extension);
-	} else {}
+
+
+		printf("fullpath: %s\n", p->fullpath);
+		p->GenGeo = calloc(strlen(p->fullpath) + 1, sizeof(char));
+		strcpy(p->GenGeo, p->fullpath);
+
+		if (arg_q == true)
+		{
+			printf("\n\n\nE AQUI TA LENDO???\n\n\n");
+
+			// splitPath(p->QRY, p->path, strlen(p->path), p->nomeArq, strlen(p->nomeArq), p->extension, strlen(p->extension));
+
+			// printf("path: %s\n", p->path);
+			// printf("nomeArq: %s\n", p->nomeArq);
+			// printf("extension: %s\n", p->extension);
+
+			p->PathQry = calloc(strlen(p->QRY) + strlen(p->path) + 10, sizeof(char));
+
+			strcpy(p->PathQry, p->path);
+			strcat(p->PathQry, "/");
+			strcat(p->PathQry, p->QRY);
+		}
+	}
+
+	
 
 	normalizePath(p->BSD, p->normpathBSD, strlen(p->BSD));
 	printf("normpathBSD: %s\n", p->normpathBSD);
-	p->GeoSVG = calloc(strlen(p->BSD) + strlen(p->nomeArq) + 5, sizeof(char));
+	p->GeoSVG = calloc(strlen(p->BSD) + strlen(p->nomeArq) + 20, sizeof(char));
+
 	strcpy(p->GeoSVG, p->normpathBSD);
+
 	strcat(p->GeoSVG, "/");//normalizar
+
 	strcat(p->GeoSVG, p->nomeArq);
+
+	printf("GeoSVG address: %p\n", p->GeoSVG);
+	printf("GeoSVG: %s\n", p->GeoSVG);
+
+	printf("nomeArq: %s\n", p->nomeArq);
+	printf("nomeArq address: %p\n", p->nomeArq);
+
 	strcat(p->GeoSVG, ".svg");
+
+	//QRY
+	p->QrySVG = calloc(strlen(p->BSD) + strlen(p->nomeArq) + 20, sizeof(char));
+	printf("\n\nAQUI!!!!!!\n\n");
+	strcpy(p->QrySVG, p->normpathBSD);
+	strcat(p->QrySVG, "/");
+	strcat(p->QrySVG, p->nomeArq);
+	strcat(p->QrySVG, "-qry.svg");
+
+	p->GenTxt = calloc(strlen(p->BSD) + strlen(p->nomeArq) + 20, sizeof(char));
+	strcpy(p->GenTxt, p->normpathBSD);
+	strcat(p->GenTxt, "/");
+	strcat(p->GenTxt, p->nomeArq);
+	strcat(p->GenTxt, "-qry.txt");
 
 	
 	printf("BED: %s\n", p->BED);
